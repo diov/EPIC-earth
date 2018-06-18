@@ -3,12 +3,9 @@
 .gradle
 /local.properties
 /.idea/caches/build_file_checksum.ser
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 app/libs/
-app/src/main/java/io/github/diov/epicearth/ui/
+/secrets.properties
