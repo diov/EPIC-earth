@@ -1,13 +1,13 @@
 package io.github.diov.epicearth.data.source.remote
 
-import io.github.diov.epicearth.BuildConfig
+import io.github.diov.epicearth.ApiService
 import io.github.diov.epicearth.data.EarthData
+import io.github.diov.epicearth.data.EarthOption
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.async
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.list
 import kotlinx.serialization.serializer
-import okhttp3.OkHttpClient
 import okhttp3.Request
 
 /**
@@ -17,17 +17,10 @@ import okhttp3.Request
 
 class EarthRemoteDataSource {
 
-    companion object {
-        private const val API_KEY = BuildConfig.API_KEY
-        private const val API_KEY_QUERY = "?api_key=$API_KEY"
-        const val DOMAIN = "https://api.nasa.gov/EPIC/api/natural$API_KEY_QUERY"
-    }
-
-    private val client = OkHttpClient()
-
-    fun fetchEarthData() = async(CommonPool) {
-        val request = Request.Builder().url(DOMAIN).build()
-        val response = client.newCall(request).execute()
+    fun fetchEarthData(option: EarthOption) = async(CommonPool) {
+        val url = "${ApiService.API_DOMAIN}/${option.colorType}${ApiService.API_KEY}"
+        val request = Request.Builder().url(url).build()
+        val response = ApiService.client.newCall(request).execute()
         val responseBody = response.body()?.string() ?: ""
         return@async JSON.nonstrict.parse(EarthData::class.serializer().list, responseBody)
     }

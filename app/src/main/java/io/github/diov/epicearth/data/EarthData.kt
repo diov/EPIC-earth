@@ -1,5 +1,6 @@
 package io.github.diov.epicearth.data
 
+import io.github.diov.epicearth.ApiService
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -16,7 +17,7 @@ data class EarthData(
     @SerialName("caption")
     val caption: String,
     @SerialName("image")
-    val imageUrl: String,
+    private val imagePath: String,
     @SerialName("version")
     val version: String,
     @SerialName("date")
@@ -38,7 +39,14 @@ data class EarthData(
     @Transient
     @SerialName("coords")
     val coordinates: EarthCoordinates? = null
-)
+) {
+    fun getImageUrl(option: EarthOption): String {
+        val datePath = date.split(" ").first().replace("-", "/")
+        val path = "/${option.colorType}/$datePath/${option.imageType}/$imagePath${option
+            .imageType.suffix}"
+        return "${ApiService.ARCHIVE_DOMAIN}$path${ApiService.API_KEY}"
+    }
+}
 
 @Serializable
 data class Coordinate(

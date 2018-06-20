@@ -1,8 +1,9 @@
 package io.github.diov.epicearth
 
+import io.github.diov.epicearth.data.ColorType.ENHANCED
+import io.github.diov.epicearth.data.EarthOption
+import io.github.diov.epicearth.data.ImageType.PNG
 import io.github.diov.epicearth.data.source.remote.EarthRemoteDataSource
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.Test
 
@@ -15,10 +16,11 @@ class ApiTest {
     @Test
     fun fetch_earth_data() {
         runBlocking {
+            println("Thread==>" + Thread.currentThread().name)
             try {
-                val fetchEarthData = EarthRemoteDataSource().fetchEarthData().await()
-                println(Thread.currentThread().name)
-                println(fetchEarthData)
+                val option = EarthOption(ENHANCED, PNG)
+                val fetchEarthData = EarthRemoteDataSource().fetchEarthData(option).await()
+                println(fetchEarthData[0].getImageUrl(option))
             } catch (e: Exception) {
                 e.printStackTrace()
             }
