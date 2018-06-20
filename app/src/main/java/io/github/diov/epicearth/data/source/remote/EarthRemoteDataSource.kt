@@ -3,7 +3,7 @@ package io.github.diov.epicearth.data.source.remote
 import io.github.diov.epicearth.BuildConfig
 import io.github.diov.epicearth.data.EarthData
 import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.experimental.async
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.list
 import kotlinx.serialization.serializer
@@ -25,10 +25,10 @@ class EarthRemoteDataSource {
 
     private val client = OkHttpClient()
 
-    suspend fun fetchEarthData() = withContext(CommonPool) {
+    fun fetchEarthData() = async(CommonPool) {
         val request = Request.Builder().url(DOMAIN).build()
         val response = client.newCall(request).execute()
         val responseBody = response.body()?.string() ?: ""
-        return@withContext JSON.nonstrict.parse(EarthData::class.serializer().list, responseBody)
+        return@async JSON.nonstrict.parse(EarthData::class.serializer().list, responseBody)
     }
 }

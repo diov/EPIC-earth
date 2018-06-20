@@ -15,11 +15,13 @@ class ApiTest {
     @Test
     fun fetch_earth_data() {
         runBlocking {
-            val job = async {
-                EarthRemoteDataSource().fetchEarthData()
+            try {
+                val fetchEarthData = EarthRemoteDataSource().fetchEarthData().await()
+                println(Thread.currentThread().name)
+                println(fetchEarthData)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-            val data = job.await()
-            println(data)
         }
     }
 }
