@@ -22,7 +22,7 @@ class EnumTest {
         assert(enhancedColorType == ColorType.ENHANCED)
 
         val defaultImageType = ImageType.typeOf("")
-        assert(defaultImageType == ImageType.PNG)
+        assert(defaultImageType == ImageType.JPG)
 
         val pngImageType = ImageType.typeOf("PNG")
         assert(pngImageType == ImageType.PNG)

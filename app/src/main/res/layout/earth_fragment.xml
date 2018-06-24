@@ -14,14 +14,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="top"
-        android:layout_marginBottom="@dimen/appbar_height"
+        android:layout_marginBottom="?attr/actionBarSize"
         android:src="@mipmap/earth_placeholder"
         app:srcCompat="@mipmap/earth_placeholder"/>
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/earthBottomAppBar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/appbar_height"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:fabAlignmentMode="end"
         app:fabCradleDiameter="0dp"

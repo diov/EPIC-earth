@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">EPIC-earth</string>
+
+    <string name="setting_title">Settings</string>
+    <string name="setting_enhanced_mode">Enhanced mode</string>
+    <string name="setting_high_quality">High quality</string>
+    <string name="setting_wifi_trigger">Download via Wifi</string>
 </resources>

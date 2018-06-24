@@ -5,11 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import io.github.diov.epicearth.R
 import io.github.diov.epicearth.data.EarthData
 import io.github.diov.epicearth.data.EarthOption
+import io.github.diov.epicearth.earth.setting.EarthSettingDialog
+import kotlinx.android.synthetic.main.earth_fragment.earthBottomAppBar
 
 class EarthFragment : Fragment() {
 
@@ -18,7 +21,8 @@ class EarthFragment : Fragment() {
     }
 
     private lateinit var viewModel: EarthViewModel
-    private var option: EarthOption? = null
+    private var optionLiveData: LiveData<EarthOption>? = null
+    private var dataLiveData: LiveData<List<EarthData>>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,25 +35,32 @@ class EarthFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(EarthViewModel::class.java)
 
-        viewModel.getEarthOptionLiveData().observe(this, Observer { option ->
-            this.option = option
-            setupBottomAppBar(option)
+        viewModel.initLiveData()
+        viewModel.earthSettingLiveData?.observe(this, Observer {
+            setupBottomAppBar()
         })
-        viewModel.getEarthDataLiveData().observe(this, Observer { dataList ->
+        dataLiveData = viewModel.earthDataLiveData
+        dataLiveData?.observe(this, Observer { dataList ->
             setupEarthPreview(dataList)
         })
     }
 
-    private fun setupBottomAppBar(option: EarthOption?) {
-        // TODO: show option bottom sheet dialog
-        println(option)
+    private fun setupBottomAppBar() {
+        earthBottomAppBar.setNavigationOnClickListener {
+            showSettingDialog()
+        }
+    }
+
+    private fun showSettingDialog() {
+        val settingDialog: EarthSettingDialog = EarthSettingDialog.newInstance(viewModel)
+        settingDialog.show(fragmentManager, "Setting Dialog")
     }
 
     private fun setupEarthPreview(dataList: List<EarthData>?) {
         if (null == dataList || dataList.isEmpty()) {
             println("no data")
         }
-        option?.let {
+        optionLiveData?.value?.let {
             val earthData = dataList?.get(0)
             val imageUrl = earthData?.getImageUrl(it)
             println(imageUrl)

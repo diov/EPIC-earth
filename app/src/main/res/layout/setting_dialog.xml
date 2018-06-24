@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <io.github.diov.epicearth.earth.setting.SettingTitle
+        android:id="@+id/settingTitle"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/secondaryLightColor"/>
+
+    <io.github.diov.epicearth.earth.setting.SettingItem
+        android:id="@+id/settingEnhancedMode"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"/>
+
+    <io.github.diov.epicearth.earth.setting.SettingItem
+        android:id="@+id/settingImageQuality"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"/>
+
+    <io.github.diov.epicearth.earth.setting.SettingItem
+        android:id="@+id/settingWifiTrigger"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"/>
+
+</LinearLayout>

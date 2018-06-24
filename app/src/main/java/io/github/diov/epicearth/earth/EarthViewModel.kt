@@ -2,53 +2,79 @@ package io.github.diov.epicearth.earth
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.github.diov.epicearth.data.EarthData
 import io.github.diov.epicearth.data.EarthOption
+import io.github.diov.epicearth.data.EarthSetting
 import io.github.diov.epicearth.data.source.local.EarthSettingLocalSource
 import io.github.diov.epicearth.data.source.remote.EarthDataRemoteSource
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
 class EarthViewModel(application: Application) : AndroidViewModel(application) {
-    private val earthDataLiveData by lazy {
-        MutableLiveData<List<EarthData>>()
-    }
 
-    private val earthOptionLiveData by lazy {
-        MutableLiveData<EarthOption>()
-    }
+    var earthDataLiveData: MutableLiveData<List<EarthData>>? = null
+        get() {
+            if (null == field) {
+                field = MutableLiveData()
+            }
+            return field
+        }
+
+    var earthOptionLiveData: MutableLiveData<EarthOption>? = null
+        get() {
+            if (null == field) {
+                field = MutableLiveData()
+            }
+            return field
+        }
+
+    var earthSettingLiveData: MutableLiveData<EarthSetting>? = null
+        get() {
+            if (null == field) {
+                field = MutableLiveData()
+            }
+            return field
+        }
 
     private val settingSource: EarthSettingLocalSource = EarthSettingLocalSource(application)
     private val dataRemoteSource: EarthDataRemoteSource = EarthDataRemoteSource()
 
-    fun getEarthOptionLiveData(): LiveData<EarthOption> {
-        loadEarthOption()
-        return earthOptionLiveData
+    fun initLiveData() {
+        val setting = settingSource.loadEarthSetting()
+        updateEarthSetting(setting)
     }
 
-    fun getEarthDataLiveData(): LiveData<List<EarthData>> {
-        fetchEarthData()
-        return earthDataLiveData
+    fun storeEarthSetting(setting: EarthSetting) {
+        settingSource.storeEarthSetting(setting)
+        updateEarthSetting(setting)
     }
 
-    private fun loadEarthOption() {
-        val option = settingSource.loadEarthOption()
-        earthOptionLiveData.value = option
+    private fun updateEarthSetting(setting: EarthSetting) {
+        earthSettingLiveData?.value = setting
+
+        val option = setting.generateOption()
+        if (earthOptionLiveData?.value?.colorType != option.colorType) {
+            fetchEarthData(option)
+        }
+        earthOptionLiveData?.value = option
     }
 
-    private fun fetchEarthData() {
+    private fun fetchEarthData(option: EarthOption) {
         try {
-            val option = earthOptionLiveData.value
-            option?.let {
-                launch(UI) {
-                    val data = dataRemoteSource.fetchEarthData(it).await()
-                    earthDataLiveData.value = data
-                }
+            launch(UI) {
+                val data = dataRemoteSource.fetchEarthData(option).await()
+                earthDataLiveData?.value = data
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    override fun onCleared() {
+        earthDataLiveData = null
+        earthOptionLiveData = null
+        earthSettingLiveData = null
+        super.onCleared()
     }
 }

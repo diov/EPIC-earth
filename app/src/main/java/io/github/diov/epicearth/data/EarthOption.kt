@@ -41,7 +41,7 @@ enum class ImageType(val extension: String) {
             return when (type.toLowerCase()) {
                 "png" -> PNG
                 "jpg" -> JPG
-                else -> PNG
+                else -> JPG
             }
         }
     }
