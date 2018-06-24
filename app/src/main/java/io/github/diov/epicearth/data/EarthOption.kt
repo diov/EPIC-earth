@@ -16,14 +16,33 @@ enum class ColorType {
     override fun toString(): String {
         return super.toString().toLowerCase()
     }
+
+    companion object {
+        fun typeOf(type: String): ColorType {
+            return when (type.toLowerCase()) {
+                "natural" -> NATURAL
+                "enhanced" -> ENHANCED
+                else -> NATURAL
+            }
+        }
+    }
 }
 
-enum class ImageType(val suffix: String) {
+enum class ImageType(val extension: String) {
     PNG(".png"),
-    JPG(".jpg"),
-    THUMBS(".jpg");
+    JPG(".jpg");
 
     override fun toString(): String {
         return super.toString().toLowerCase()
+    }
+
+    companion object {
+        fun typeOf(type: String): ImageType {
+            return when (type.toLowerCase()) {
+                "png" -> PNG
+                "jpg" -> JPG
+                else -> PNG
+            }
+        }
     }
 }

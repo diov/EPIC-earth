@@ -15,7 +15,7 @@ import okhttp3.Request
  * Copyright © 2018 diov.github.io. All rights reserved.
  */
 
-class EarthRemoteDataSource {
+class EarthDataRemoteSource {
 
     fun fetchEarthData(option: EarthOption) = async(CommonPool) {
         val url = "${ApiService.API_DOMAIN}/${option.colorType}${ApiService.API_KEY}"

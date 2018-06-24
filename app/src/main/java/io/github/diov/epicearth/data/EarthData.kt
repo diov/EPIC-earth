@@ -43,7 +43,7 @@ data class EarthData(
     fun getImageUrl(option: EarthOption): String {
         val datePath = date.split(" ").first().replace("-", "/")
         val path = "/${option.colorType}/$datePath/${option.imageType}/$imagePath${option
-            .imageType.suffix}"
+            .imageType.extension}"
         return "${ApiService.ARCHIVE_DOMAIN}$path${ApiService.API_KEY}"
     }
 }
