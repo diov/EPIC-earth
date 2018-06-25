@@ -1,5 +1,8 @@
 package io.github.diov.epicearth.earth
 
+import android.app.WallpaperManager
+import android.content.ComponentName
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +14,9 @@ import androidx.lifecycle.ViewModelProviders
 import com.squareup.picasso.Picasso
 import io.github.diov.epicearth.R
 import io.github.diov.epicearth.earth.setting.EarthSettingDialog
+import io.github.diov.epicearth.wallpaper.EpicWallpaperService
 import kotlinx.android.synthetic.main.earth_fragment.earthBottomAppBar
+import kotlinx.android.synthetic.main.earth_fragment.earthFloatingActionButton
 import kotlinx.android.synthetic.main.earth_fragment.earthPreviewView
 
 class EarthFragment : Fragment() {
@@ -50,6 +55,24 @@ class EarthFragment : Fragment() {
         Picasso.get()
             .load(R.mipmap.earth_placeholder)
             .into(earthPreviewView)
+
+        earthFloatingActionButton.setOnClickListener {
+            val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
+
+            intent.putExtra(
+                WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                ComponentName(context, EpicWallpaperService::class.java)
+            )
+
+            intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+
+            if (intent.resolveActivity(context?.packageManager) != null) {
+                startActivity(intent)
+            } else {
+                // TODO: show friendly message.
+            }
+
+        }
     }
 
     private fun setupBottomAppBar() {

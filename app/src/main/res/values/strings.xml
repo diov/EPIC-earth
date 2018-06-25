@@ -5,4 +5,6 @@
     <string name="setting_enhanced_mode">Enhanced mode</string>
     <string name="setting_high_quality">High quality</string>
     <string name="setting_wifi_trigger">Download via Wifi</string>
+
+    <string name="wallpaper_description">Wallpaper fetched from NASA EPIC.</string>
 </resources>
