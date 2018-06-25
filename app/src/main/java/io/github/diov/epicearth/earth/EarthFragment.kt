@@ -8,11 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.squareup.picasso.Picasso
 import io.github.diov.epicearth.R
-import io.github.diov.epicearth.data.EarthData
-import io.github.diov.epicearth.data.EarthOption
 import io.github.diov.epicearth.earth.setting.EarthSettingDialog
 import kotlinx.android.synthetic.main.earth_fragment.earthBottomAppBar
+import kotlinx.android.synthetic.main.earth_fragment.earthPreviewView
 
 class EarthFragment : Fragment() {
 
@@ -21,8 +21,7 @@ class EarthFragment : Fragment() {
     }
 
     private lateinit var viewModel: EarthViewModel
-    private var optionLiveData: LiveData<EarthOption>? = null
-    private var dataLiveData: LiveData<List<EarthData>>? = null
+    private var imageLiveData: LiveData<String>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,10 +38,18 @@ class EarthFragment : Fragment() {
         viewModel.earthSettingLiveData?.observe(this, Observer {
             setupBottomAppBar()
         })
-        dataLiveData = viewModel.earthDataLiveData
-        dataLiveData?.observe(this, Observer { dataList ->
-            setupEarthPreview(dataList)
+        imageLiveData = viewModel.earthImageLiveData
+        imageLiveData?.observe(this, Observer { url ->
+            setupEarthPreview(url)
         })
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        Picasso.get()
+            .load(R.mipmap.earth_placeholder)
+            .into(earthPreviewView)
     }
 
     private fun setupBottomAppBar() {
@@ -56,15 +63,16 @@ class EarthFragment : Fragment() {
         settingDialog.show(fragmentManager, "Setting Dialog")
     }
 
-    private fun setupEarthPreview(dataList: List<EarthData>?) {
-        if (null == dataList || dataList.isEmpty()) {
-            println("no data")
-        }
-        optionLiveData?.value?.let {
-            val earthData = dataList?.get(0)
-            val imageUrl = earthData?.getImageUrl(it)
-            println(imageUrl)
-
+    private fun setupEarthPreview(url: String?) {
+        if (url.isNullOrEmpty()) {
+            Picasso.get()
+                .load(R.mipmap.earth_placeholder)
+                .into(earthPreviewView)
+        } else {
+            Picasso.get()
+                .load(url)
+                .into(earthPreviewView)
         }
     }
 }
+

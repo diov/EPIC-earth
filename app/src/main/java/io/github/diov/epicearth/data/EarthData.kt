@@ -40,10 +40,9 @@ data class EarthData(
     @SerialName("coords")
     val coordinates: EarthCoordinates? = null
 ) {
-    fun getImageUrl(option: EarthOption): String {
+    fun getPreviewImageUrl(option: EarthOption): String {
         val datePath = date.split(" ").first().replace("-", "/")
-        val path = "/${option.colorType}/$datePath/${option.imageType}/$imagePath${option
-            .imageType.extension}"
+        val path = "/${option.colorType}/$datePath/png/$imagePath.png"
         return "${ApiService.ARCHIVE_DOMAIN}$path${ApiService.API_KEY}"
     }
 }

@@ -14,9 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="top"
-        android:layout_marginBottom="?attr/actionBarSize"
-        android:src="@mipmap/earth_placeholder"
-        app:srcCompat="@mipmap/earth_placeholder"/>
+        android:layout_marginBottom="?attr/actionBarSize"/>
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/earthBottomAppBar"

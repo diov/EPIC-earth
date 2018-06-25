@@ -20,7 +20,7 @@ class ApiTest {
             try {
                 val option = EarthOption(ENHANCED, PNG)
                 val fetchEarthData = EarthDataRemoteSource().fetchEarthData(option).await()
-                println(fetchEarthData[0].getImageUrl(option))
+                println(fetchEarthData[0].getPreviewImageUrl(option))
             } catch (e: Exception) {
                 e.printStackTrace()
             }
