@@ -52,10 +52,6 @@ class EarthFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Picasso.get()
-            .load(R.mipmap.earth_placeholder)
-            .into(earthPreviewView)
-
         earthFloatingActionButton.setOnClickListener {
             val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
 

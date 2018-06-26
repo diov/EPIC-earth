@@ -5,16 +5,16 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.service.wallpaper.WallpaperService
+import android.util.Log
 import android.view.SurfaceHolder
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Picasso.LoadedFrom
 import com.squareup.picasso.Target
+import io.github.diov.epicearth.R
 import io.github.diov.epicearth.data.EarthOption
 import io.github.diov.epicearth.data.EarthSetting
+import io.github.diov.epicearth.data.source.local.EarthPreviousLocalSource
 import io.github.diov.epicearth.data.source.local.EarthSettingLocalSource
-import io.github.diov.epicearth.data.source.remote.EarthDataRemoteSource
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import java.lang.Exception
 
 /**
@@ -27,22 +27,29 @@ class EpicWallpaperService : WallpaperService() {
     private lateinit var setting: EarthSetting
     private lateinit var option: EarthOption
     private lateinit var engine: EpicWallpaperEngine
+    private var isDestroyed: Boolean = false
 
     override fun onCreate() {
         super.onCreate()
 
+        isDestroyed = false
         setting = EarthSettingLocalSource(this@EpicWallpaperService).loadEarthSetting()
         option = setting.generateOption()
-        // TODO: add JobScheduler
+        Log.i("WallpaperService==>", "onCreate")
     }
 
     override fun onDestroy() {
         // TODO: remove JobScheduler
 
+        isDestroyed = true
+        Log.i("WallpaperService==>", "onDestroy")
         super.onDestroy()
     }
 
     override fun onCreateEngine(): Engine {
+        Log.i("WallpaperService==>", "onCreateEngine")
+        // TODO: add JobScheduler
+
         val engine = EpicWallpaperEngine()
         this.engine = engine
         return engine
@@ -51,13 +58,27 @@ class EpicWallpaperService : WallpaperService() {
     inner class EpicWallpaperEngine : WallpaperService.Engine() {
         private val region: Rect = Rect()
         private val paint: Paint = Paint()
+        private val bitmapTarget: Target = object : Target {
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) = Unit
+
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) = Unit
+
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: LoadedFrom?) {
+                bitmap?.let { drawWallpaper(it) }
+            }
+        }
 
         init {
             paint.isFilterBitmap = true
         }
 
+        override fun onSurfaceDestroyed(holder: SurfaceHolder?) {
+            super.onSurfaceDestroyed(holder)
+        }
+
         override fun onSurfaceCreated(holder: SurfaceHolder?) {
             super.onSurfaceCreated(holder)
+
             if (isVisible) {
                 fetchAndDraw()
             }
@@ -65,33 +86,35 @@ class EpicWallpaperService : WallpaperService() {
 
         override fun onSurfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
             super.onSurfaceChanged(holder, format, width, height)
+
             fetchAndDraw()
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
+
             if (visible) {
                 fetchAndDraw()
             }
         }
 
         private fun fetchAndDraw() {
-            launch(UI) {
-                val list = EarthDataRemoteSource().fetchEarthData(option).await()
-                val imageUrl = list[0].getRealImageUrl(option)
-                Picasso.Builder(this@EpicWallpaperService).build().load(imageUrl).into(object : Target {
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) = Unit
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) = Unit
-
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: LoadedFrom?) {
-                        bitmap?.let {
-                            drawWallpaper(bitmap)
-                        }
-                    }
-                })
+            val imageUrl = EarthPreviousLocalSource(this@EpicWallpaperService).loadPreviousImage()
+            if (imageUrl.isEmpty()) {
+                Picasso.Builder(this@EpicWallpaperService).build()
+                    .load(R.mipmap.earth_placeholder)
+                    .into(bitmapTarget)
+            } else {
+                Picasso.Builder(this@EpicWallpaperService).build()
+                    .load(imageUrl)
+                    .into(bitmapTarget)
             }
         }
 
         private fun drawWallpaper(bitmap: Bitmap) {
+            if (isDestroyed) {
+                return
+            }
+
             val canvas = surfaceHolder.lockCanvas()
 
             region.set(0, 0, canvas.width, canvas.height)
