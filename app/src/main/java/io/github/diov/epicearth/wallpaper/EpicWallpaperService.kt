@@ -58,6 +58,7 @@ class EpicWallpaperService : WallpaperService() {
     inner class EpicWallpaperEngine : WallpaperService.Engine() {
         private val region: Rect = Rect()
         private val paint: Paint = Paint()
+        private val picasso: Picasso = Picasso.Builder(this@EpicWallpaperService).build()
         private val bitmapTarget: Target = object : Target {
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) = Unit
 
@@ -98,14 +99,13 @@ class EpicWallpaperService : WallpaperService() {
         }
 
         private fun fetchAndDraw() {
-            val imageUrl = EarthPreviousLocalSource(this@EpicWallpaperService).loadPreviousImage()
+            val imageUrl = EarthPreviousLocalSource(this@EpicWallpaperService).loadRealImage()
+            Log.i("WallpaperService==>", "previous image: $imageUrl")
             if (imageUrl.isEmpty()) {
-                Picasso.Builder(this@EpicWallpaperService).build()
-                    .load(R.mipmap.earth_placeholder)
+                picasso.load(R.mipmap.earth_placeholder)
                     .into(bitmapTarget)
             } else {
-                Picasso.Builder(this@EpicWallpaperService).build()
-                    .load(imageUrl)
+                picasso.load(imageUrl)
                     .into(bitmapTarget)
             }
         }

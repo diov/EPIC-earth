@@ -24,8 +24,19 @@ class EarthPreviousLocalSource(private val context: Context) {
         return sharedPreferences.getString(PREVIOUS_IMAGE, "")
     }
 
+    fun storeRealImage(imageUrl: String) {
+        val edit = sharedPreferences.edit()
+        edit.putString(REAL_IMAGE, imageUrl)
+        edit.apply()
+    }
+
+    fun loadRealImage(): String {
+        return sharedPreferences.getString(REAL_IMAGE, "")
+    }
+
     companion object {
         const val EARTH_PREVIOUS = "earth_setting"
         const val PREVIOUS_IMAGE = "previous_image"
+        const val REAL_IMAGE = "real_image"
     }
 }

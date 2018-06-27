@@ -50,7 +50,7 @@ class EarthViewModel(application: Application) : AndroidViewModel(application) {
         earthSettingLiveData?.value = setting
 
         val option = setting.generateOption()
-        if (this.option?.colorType != option.colorType) {
+        if (this.option?.colorType != option.colorType || this.option?.imageType != option.imageType) {
             fetchEarthData(option)
         }
         this.option = option
@@ -60,9 +60,11 @@ class EarthViewModel(application: Application) : AndroidViewModel(application) {
         try {
             launch(UI) {
                 val data = dataRemoteSource.fetchEarthData(option).await()
-                val imageUrl = data[0].getPreviewImageUrl(option)
-                previousSouce.storePreviousImage(imageUrl)
-                earthImageLiveData?.value = imageUrl
+                val previewImageUrl = data[0].getPreviewImageUrl(option)
+                val realImageUrl = data[0].getRealImageUrl(option)
+                previousSouce.storePreviousImage(previewImageUrl)
+                previousSouce.storeRealImage(realImageUrl)
+                earthImageLiveData?.value = previewImageUrl
             }
         } catch (e: Exception) {
             e.printStackTrace()
