@@ -83,6 +83,11 @@ class EpicWallpaperService : WallpaperService() {
             contentResolver.registerContentObserver(Constant.LATEST_UPDATE_URL, false, contentObservable)
         }
 
+        override fun onDestroy() {
+            super.onDestroy()
+            contentResolver.unregisterContentObserver(contentObservable)
+        }
+
         override fun onSurfaceCreated(holder: SurfaceHolder?) {
             super.onSurfaceCreated(holder)
 
