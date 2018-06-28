@@ -10,6 +10,8 @@ import android.net.Uri
 
 object Constant {
 
+    const val FETCH_JOB_ID = 10086
+
     private const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.epic"
 
     private val CONTENT_URI = Uri.Builder()

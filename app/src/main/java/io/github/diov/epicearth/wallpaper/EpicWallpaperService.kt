@@ -16,6 +16,8 @@ import com.squareup.picasso.Target
 import io.github.diov.epicearth.Constant
 import io.github.diov.epicearth.R
 import io.github.diov.epicearth.data.source.local.EarthDataLocalSource
+import io.github.diov.epicearth.data.source.local.EarthSettingLocalSource
+import io.github.diov.epicearth.helper.JobSchedulerHelper
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.lang.Exception
@@ -67,12 +69,14 @@ class EpicWallpaperService : WallpaperService() {
                 bitmap?.let { drawWallpaper(it) }
             }
         }
+
         private val contentObservable: ContentObserver = object : ContentObserver(Handler()) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 super.onChange(selfChange, uri)
                 fetchAndDraw()
             }
         }
+        private val schedulerHelper = JobSchedulerHelper(this@EpicWallpaperService)
 
         init {
             paint.isFilterBitmap = true
@@ -81,11 +85,18 @@ class EpicWallpaperService : WallpaperService() {
         override fun onCreate(surfaceHolder: SurfaceHolder?) {
             super.onCreate(surfaceHolder)
             contentResolver.registerContentObserver(Constant.LATEST_UPDATE_URL, false, contentObservable)
+            if (!isPreview) {
+                val setting = EarthSettingLocalSource(this@EpicWallpaperService).loadEarthSetting()
+                schedulerHelper.startFetchJob(setting)
+            }
         }
 
         override fun onDestroy() {
-            super.onDestroy()
             contentResolver.unregisterContentObserver(contentObservable)
+            if (!isPreview) {
+                schedulerHelper.stopFetchJob()
+            }
+            super.onDestroy()
         }
 
         override fun onSurfaceCreated(holder: SurfaceHolder?) {

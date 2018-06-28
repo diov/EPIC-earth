@@ -68,7 +68,7 @@ class EarthViewModel(application: Application) : AndroidViewModel(application) {
                 val dataList = originData.map {
                     EarthData.fromOriginData(it, option)
                 }
-                previousSource.storeEarthData(*dataList.toTypedArray())
+                previousSource.storeEarthData(dataList)
                 getApplication<EpicApplication>().contentResolver
                     .notifyChange(Constant.LATEST_UPDATE_URL, null)
                 // TODO: remove hardcode position

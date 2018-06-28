@@ -24,6 +24,7 @@
                 <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
         </activity>
+
         <service
             android:name=".wallpaper.EpicWallpaperService"
             android:label="@string/app_name"
@@ -36,6 +37,10 @@
                 android:name="android.service.wallpaper"
                 android:resource="@xml/epic_wallpaper"/>
         </service>
+        <service
+            android:name=".job.FetchJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
         <provider
             android:name=".UpdateContentProvider"
             android:authorities="${applicationId}.epic"

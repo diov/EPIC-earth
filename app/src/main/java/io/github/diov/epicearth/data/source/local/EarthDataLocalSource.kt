@@ -20,8 +20,8 @@ class EarthDataLocalSource(context: Context) {
         earthDataDao = earthDatabase.earthDataDao()
     }
 
-    suspend fun storeEarthData(vararg earthData: EarthData) = async {
-        return@async earthDataDao.storeEarthData(*earthData)
+    suspend fun storeEarthData(dataList: List<EarthData>) = async {
+        return@async earthDataDao.storeEarthData(*dataList.toTypedArray())
     }.await()
 
     suspend fun loadLatestEarth(): List<EarthData> = async {
