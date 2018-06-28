@@ -25,40 +25,30 @@ data class EarthData(
     val imageUrl: String,
     val version: String,
     val date: String,
-    @Embedded(prefix = "centroid")
+    @Embedded(prefix = "centroid_")
     val centroidCoordinates: Coordinate,
-    @Embedded(prefix = "satellite")
-    val satellitePosition: Position? = null,
-    @Embedded(prefix = "lunar")
-    val lunarPosition: Position? = null,
-    @Embedded(prefix = "sun")
-    val sunPosition: Position? = null,
+    @Embedded(prefix = "satellite_")
+    val satellitePosition: Position,
+    @Embedded(prefix = "lunar_")
+    val lunarPosition: Position,
+    @Embedded(prefix = "sun_")
+    val sunPosition: Position,
     @Embedded
-    val satelliteAttitude: Attitude? = null
+    val satelliteAttitude: Attitude
 ) {
     companion object {
         fun fromOriginData(originData: EarthOriginData, option: EarthOption): EarthData {
-            val id = originData.id
-            val previewUrl = originData.getPreviewImageUrl(option)
-            val imageUrl = originData.getRealImageUrl(option)
-            val version = originData.version
-            val date = originData.date
-            val centroidCoordinates = originData.centroidCoordinates
-            val satellitePosition = originData.satellitePosition
-            val lunarPosition = originData.lunarPosition
-            val sunPosition = originData.sunPosition
-            val satelliteAttitude = originData.satelliteAttitude
             return EarthData(
-                id,
-                previewUrl,
-                imageUrl,
-                version,
-                date,
-                centroidCoordinates,
-                satellitePosition,
-                lunarPosition,
-                sunPosition,
-                satelliteAttitude
+                originData.id,
+                originData.getPreviewImageUrl(option),
+                originData.getRealImageUrl(option),
+                originData.version,
+                originData.date,
+                originData.centroidCoordinates,
+                originData.satellitePosition,
+                originData.lunarPosition,
+                originData.sunPosition,
+                originData.satelliteAttitude
             )
         }
     }

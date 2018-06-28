@@ -7,8 +7,7 @@
 
     <uses-feature
         android:name="android.software.live_wallpaper"
-        android:required="true" >
-    </uses-feature>
+        android:required="true"/>
 
     <application
         android:name=".EpicApplication"
@@ -37,6 +36,10 @@
                 android:name="android.service.wallpaper"
                 android:resource="@xml/epic_wallpaper"/>
         </service>
+        <provider
+            android:name=".UpdateContentProvider"
+            android:authorities="${applicationId}.epic"
+            android:exported="false"/>
     </application>
 
 </manifest>

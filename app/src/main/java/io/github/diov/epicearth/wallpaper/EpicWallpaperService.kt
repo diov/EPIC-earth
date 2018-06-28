@@ -1,20 +1,21 @@
 package io.github.diov.epicearth.wallpaper
 
+import android.database.ContentObserver
 import android.graphics.Bitmap
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Handler
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Picasso.LoadedFrom
 import com.squareup.picasso.Target
+import io.github.diov.epicearth.Constant
 import io.github.diov.epicearth.R
-import io.github.diov.epicearth.data.EarthOption
-import io.github.diov.epicearth.data.EarthSetting
-import io.github.diov.epicearth.data.source.local.EarthPreviousLocalSource
-import io.github.diov.epicearth.data.source.local.EarthSettingLocalSource
+import io.github.diov.epicearth.data.source.local.EarthDataLocalSource
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.lang.Exception
@@ -26,8 +27,6 @@ import java.lang.Exception
 
 class EpicWallpaperService : WallpaperService() {
 
-    private lateinit var setting: EarthSetting
-    private lateinit var option: EarthOption
     private lateinit var engine: EpicWallpaperEngine
     private var isDestroyed: Boolean = false
 
@@ -35,8 +34,6 @@ class EpicWallpaperService : WallpaperService() {
         super.onCreate()
 
         isDestroyed = false
-        setting = EarthSettingLocalSource(this@EpicWallpaperService).loadEarthSetting()
-        option = setting.generateOption()
         Log.i("WallpaperService==>", "onCreate")
     }
 
@@ -70,13 +67,20 @@ class EpicWallpaperService : WallpaperService() {
                 bitmap?.let { drawWallpaper(it) }
             }
         }
+        private val contentObservable: ContentObserver = object : ContentObserver(Handler()) {
+            override fun onChange(selfChange: Boolean, uri: Uri?) {
+                super.onChange(selfChange, uri)
+                fetchAndDraw()
+            }
+        }
 
         init {
             paint.isFilterBitmap = true
         }
 
-        override fun onSurfaceDestroyed(holder: SurfaceHolder?) {
-            super.onSurfaceDestroyed(holder)
+        override fun onCreate(surfaceHolder: SurfaceHolder?) {
+            super.onCreate(surfaceHolder)
+            contentResolver.registerContentObserver(Constant.LATEST_UPDATE_URL, false, contentObservable)
         }
 
         override fun onSurfaceCreated(holder: SurfaceHolder?) {
@@ -102,7 +106,7 @@ class EpicWallpaperService : WallpaperService() {
 
         private fun fetchAndDraw() {
             launch(UI) {
-                val earth = EarthPreviousLocalSource(this@EpicWallpaperService).loadLatestEarth()
+                val earth = EarthDataLocalSource(this@EpicWallpaperService).loadLatestEarth()
                 val imageUrl = earth[0].imageUrl
                 Log.i("WallpaperService==>", "previous image: $imageUrl")
                 if (imageUrl.isEmpty()) {
@@ -116,7 +120,7 @@ class EpicWallpaperService : WallpaperService() {
         }
 
         private fun drawWallpaper(bitmap: Bitmap) {
-            if (isDestroyed) {
+            if (isDestroyed || !isVisible) {
                 return
             }
 

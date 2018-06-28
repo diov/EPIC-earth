@@ -3,10 +3,12 @@ package io.github.diov.epicearth.earth
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import io.github.diov.epicearth.Constant
+import io.github.diov.epicearth.EpicApplication
 import io.github.diov.epicearth.data.EarthOption
 import io.github.diov.epicearth.data.EarthSetting
 import io.github.diov.epicearth.data.dao.EarthData
-import io.github.diov.epicearth.data.source.local.EarthPreviousLocalSource
+import io.github.diov.epicearth.data.source.local.EarthDataLocalSource
 import io.github.diov.epicearth.data.source.local.EarthSettingLocalSource
 import io.github.diov.epicearth.data.source.remote.EarthDataRemoteSource
 import kotlinx.coroutines.experimental.android.UI
@@ -31,7 +33,7 @@ class EarthViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     private val settingSource: EarthSettingLocalSource = EarthSettingLocalSource(application)
-    private val previousSource: EarthPreviousLocalSource = EarthPreviousLocalSource(application)
+    private val previousSource: EarthDataLocalSource = EarthDataLocalSource(application)
     private val dataRemoteSource: EarthDataRemoteSource = EarthDataRemoteSource()
     private var option: EarthOption? = null
 
@@ -67,6 +69,8 @@ class EarthViewModel(application: Application) : AndroidViewModel(application) {
                     EarthData.fromOriginData(it, option)
                 }
                 previousSource.storeEarthData(*dataList.toTypedArray())
+                getApplication<EpicApplication>().contentResolver
+                    .notifyChange(Constant.LATEST_UPDATE_URL, null)
                 // TODO: remove hardcode position
                 val previewImageUrl = dataList[0].previewUrl
                 earthImageLiveData?.value = previewImageUrl
