@@ -1,7 +1,7 @@
 package io.github.diov.epicearth.data.source.remote
 
 import io.github.diov.epicearth.ApiService
-import io.github.diov.epicearth.data.EarthData
+import io.github.diov.epicearth.data.EarthOriginData
 import io.github.diov.epicearth.data.EarthOption
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.async
@@ -17,11 +17,11 @@ import okhttp3.Request
 
 class EarthDataRemoteSource {
 
-    fun fetchEarthData(option: EarthOption) = async(CommonPool) {
+    suspend fun fetchEarthData(option: EarthOption) = async(CommonPool) {
         val url = "${ApiService.API_DOMAIN}/${option.colorType}${ApiService.API_KEY}"
         val request = Request.Builder().url(url).build()
         val response = ApiService.client.newCall(request).execute()
         val responseBody = response.body()?.string() ?: ""
-        return@async JSON.nonstrict.parse(EarthData::class.serializer().list, responseBody)
-    }
+        return@async JSON.nonstrict.parse(EarthOriginData::class.serializer().list, responseBody)
+    }.await()
 }

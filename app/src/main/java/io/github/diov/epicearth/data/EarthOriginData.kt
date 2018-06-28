@@ -11,7 +11,7 @@ import kotlinx.serialization.Transient
  */
 
 @Serializable
-data class EarthData(
+data class EarthOriginData(
     @SerialName("identifier")
     val id: String,
     @SerialName("caption")
@@ -24,21 +24,16 @@ data class EarthData(
     val date: String,
     @SerialName("centroid_coordinates")
     val centroidCoordinates: Coordinate,
-    @Transient
     @SerialName("dscovr_j2000_position")
-    val satellitePosition: Position? = null,
-    @Transient
+    val satellitePosition: Position,
     @SerialName("lunar_j2000_position")
-    val lunarPosition: Position? = null,
-    @Transient
+    val lunarPosition: Position,
     @SerialName("sun_j2000_position")
-    val sunPosition: Position? = null,
-    @Transient
+    val sunPosition: Position,
     @SerialName("attitude_quaternions")
-    val satelliteAttitude: Attitude? = null,
-    @Transient
+    val satelliteAttitude: Attitude,
     @SerialName("coords")
-    val coordinates: EarthCoordinates? = null
+    val coordinates: EarthCoordinates
 ) {
     fun getPreviewImageUrl(option: EarthOption): String {
         val datePath = date.split(" ").first().replace("-", "/")

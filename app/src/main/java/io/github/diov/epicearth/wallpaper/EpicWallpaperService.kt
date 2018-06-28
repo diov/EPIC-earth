@@ -15,6 +15,8 @@ import io.github.diov.epicearth.data.EarthOption
 import io.github.diov.epicearth.data.EarthSetting
 import io.github.diov.epicearth.data.source.local.EarthPreviousLocalSource
 import io.github.diov.epicearth.data.source.local.EarthSettingLocalSource
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import java.lang.Exception
 
 /**
@@ -99,14 +101,17 @@ class EpicWallpaperService : WallpaperService() {
         }
 
         private fun fetchAndDraw() {
-            val imageUrl = EarthPreviousLocalSource(this@EpicWallpaperService).loadRealImage()
-            Log.i("WallpaperService==>", "previous image: $imageUrl")
-            if (imageUrl.isEmpty()) {
-                picasso.load(R.mipmap.earth_placeholder)
-                    .into(bitmapTarget)
-            } else {
-                picasso.load(imageUrl)
-                    .into(bitmapTarget)
+            launch(UI) {
+                val earth = EarthPreviousLocalSource(this@EpicWallpaperService).loadLatestEarth()
+                val imageUrl = earth[0].imageUrl
+                Log.i("WallpaperService==>", "previous image: $imageUrl")
+                if (imageUrl.isEmpty()) {
+                    picasso.load(R.mipmap.earth_placeholder)
+                        .into(bitmapTarget)
+                } else {
+                    picasso.load(imageUrl)
+                        .into(bitmapTarget)
+                }
             }
         }
 

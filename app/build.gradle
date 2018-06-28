@@ -1,12 +1,13 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
 
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "io.github.diov.epic_earth"
+        applicationId "io.github.diov.epicearth"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
@@ -14,8 +15,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        applicationVariants.all { variant ->
-            variant.buildConfigField "String", "API_KEY", "\""+getApiKey()+"\""
+        applicationVariants.all { variant -> variant.buildConfigField "String", "API_KEY", "\"" + getApiKey() + "\""
         }
 
         release {
@@ -32,13 +32,18 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.23.3'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.23.3"
 
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+
     implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
     implementation 'androidx.appcompat:appcompat:1.0.0-alpha3'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0-alpha1'
     implementation 'com.google.android.material:material:1.0.0-alpha1'
 
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    implementation 'com.facebook.stetho:stetho:1.5.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha3'

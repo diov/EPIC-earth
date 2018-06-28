@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.github.diov.epicearth.data.EarthOption
 import io.github.diov.epicearth.data.EarthSetting
+import io.github.diov.epicearth.data.dao.EarthData
 import io.github.diov.epicearth.data.source.local.EarthPreviousLocalSource
 import io.github.diov.epicearth.data.source.local.EarthSettingLocalSource
 import io.github.diov.epicearth.data.source.remote.EarthDataRemoteSource
@@ -30,15 +31,17 @@ class EarthViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     private val settingSource: EarthSettingLocalSource = EarthSettingLocalSource(application)
-    private val previousSouce: EarthPreviousLocalSource = EarthPreviousLocalSource(application)
+    private val previousSource: EarthPreviousLocalSource = EarthPreviousLocalSource(application)
     private val dataRemoteSource: EarthDataRemoteSource = EarthDataRemoteSource()
     private var option: EarthOption? = null
 
     fun initLiveData() {
-        val setting = settingSource.loadEarthSetting()
-        val previousImage = previousSouce.loadPreviousImage()
-        earthImageLiveData?.value = previousImage
-        updateEarthSetting(setting)
+        launch(UI) {
+            val setting = settingSource.loadEarthSetting()
+            val latestEarth = previousSource.loadLatestEarth()
+            earthImageLiveData?.value = if (latestEarth.isEmpty()) "" else latestEarth[0].previewUrl
+            updateEarthSetting(setting)
+        }
     }
 
     fun storeEarthSetting(setting: EarthSetting) {
@@ -59,11 +62,13 @@ class EarthViewModel(application: Application) : AndroidViewModel(application) {
     private fun fetchEarthData(option: EarthOption) {
         try {
             launch(UI) {
-                val data = dataRemoteSource.fetchEarthData(option).await()
-                val previewImageUrl = data[0].getPreviewImageUrl(option)
-                val realImageUrl = data[0].getRealImageUrl(option)
-                previousSouce.storePreviousImage(previewImageUrl)
-                previousSouce.storeRealImage(realImageUrl)
+                val originData = dataRemoteSource.fetchEarthData(option)
+                val dataList = originData.map {
+                    EarthData.fromOriginData(it, option)
+                }
+                previousSource.storeEarthData(*dataList.toTypedArray())
+                // TODO: remove hardcode position
+                val previewImageUrl = dataList[0].previewUrl
                 earthImageLiveData?.value = previewImageUrl
             }
         } catch (e: Exception) {

@@ -1,42 +1,32 @@
 package io.github.diov.epicearth.data.source.local
 
 import android.content.Context
-import android.content.SharedPreferences
+import io.github.diov.epicearth.data.dao.EarthData
+import io.github.diov.epicearth.data.dao.EarthDataDao
+import io.github.diov.epicearth.data.dao.EarthDatabase
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.withContext
 
 /**
  * Created by Dio_V on 2018/6/24.
  * Copyright © 2018 diov.github.io. All rights reserved.
  */
 
-class EarthPreviousLocalSource(private val context: Context) {
+class EarthPreviousLocalSource(context: Context) {
 
-    private val sharedPreferences: SharedPreferences by lazy {
-        context.getSharedPreferences(EARTH_PREVIOUS, Context.MODE_PRIVATE)
+    private val earthDataDao: EarthDataDao
+
+    init {
+        val earthDatabase = EarthDatabase.getInstance(context)
+        earthDataDao = earthDatabase.earthDataDao()
     }
 
-    fun storePreviousImage(imageUrl: String) {
-        val edit = sharedPreferences.edit()
-        edit.putString(PREVIOUS_IMAGE, imageUrl)
-        edit.apply()
+    suspend fun storeEarthData(vararg earthData: EarthData) = withContext(CommonPool) {
+        earthDataDao.storeEarthData(*earthData)
     }
 
-    fun loadPreviousImage(): String {
-        return sharedPreferences.getString(PREVIOUS_IMAGE, "")
-    }
-
-    fun storeRealImage(imageUrl: String) {
-        val edit = sharedPreferences.edit()
-        edit.putString(REAL_IMAGE, imageUrl)
-        edit.apply()
-    }
-
-    fun loadRealImage(): String {
-        return sharedPreferences.getString(REAL_IMAGE, "")
-    }
-
-    companion object {
-        const val EARTH_PREVIOUS = "earth_setting"
-        const val PREVIOUS_IMAGE = "previous_image"
-        const val REAL_IMAGE = "real_image"
-    }
+    suspend fun loadLatestEarth(): List<EarthData> = async {
+        return@async earthDataDao.loadLatestEarth()
+    }.await()
 }

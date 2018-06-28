@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("io.github.diov.epic_earth", appContext.packageName)
+        assertEquals("io.github.diov.epicearth", appContext.packageName)
     }
 }
