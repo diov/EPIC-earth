@@ -11,6 +11,7 @@ import io.github.diov.epicearth.data.dao.EarthData
 import io.github.diov.epicearth.data.source.local.EarthDataLocalSource
 import io.github.diov.epicearth.data.source.local.EarthSettingLocalSource
 import io.github.diov.epicearth.data.source.remote.EarthDataRemoteSource
+import io.github.diov.epicearth.helper.random
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
@@ -41,7 +42,14 @@ class EarthViewModel(application: Application) : AndroidViewModel(application) {
         launch(UI) {
             val setting = settingSource.loadEarthSetting()
             val latestEarth = previousSource.loadLatestEarth()
-            earthImageLiveData?.value = if (latestEarth.isEmpty()) "" else latestEarth[0].previewUrl
+            val imageUrl: String
+            imageUrl = if (latestEarth.isEmpty()) {
+                ""
+            } else {
+                val randomData = latestEarth.random()
+                randomData?.previewUrl ?: ""
+            }
+            earthImageLiveData?.value = imageUrl
             updateEarthSetting(setting)
         }
     }
@@ -71,8 +79,7 @@ class EarthViewModel(application: Application) : AndroidViewModel(application) {
                 previousSource.storeEarthData(dataList)
                 getApplication<EpicApplication>().contentResolver
                     .notifyChange(Constant.LATEST_UPDATE_URL, null)
-                // TODO: remove hardcode position
-                val previewImageUrl = dataList[0].previewUrl
+                val previewImageUrl = dataList.random()?.previewUrl
                 earthImageLiveData?.value = previewImageUrl
             }
         } catch (e: Exception) {
