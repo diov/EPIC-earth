@@ -16,9 +16,9 @@ import kotlinx.coroutines.experimental.launch
 
 class FetchJobService : JobService() {
 
-    private val settingSource: EarthSettingLocalSource = EarthSettingLocalSource(application)
+    private val settingSource: EarthSettingLocalSource = EarthSettingLocalSource(this)
 
-    override fun onStopJob(params: JobParameters?): Boolean {
+    override fun onStartJob(params: JobParameters?): Boolean {
         try {
             launch {
                 val setting = settingSource.loadEarthSetting()
@@ -39,7 +39,7 @@ class FetchJobService : JobService() {
         return true
     }
 
-    override fun onStartJob(params: JobParameters?): Boolean {
+    override fun onStopJob(params: JobParameters?): Boolean {
         return true
     }
 }
