@@ -50,7 +50,6 @@ class EpicWallpaperService : WallpaperService() {
 
     override fun onCreateEngine(): Engine {
         Log.i("WallpaperService==>", "onCreateEngine")
-        // TODO: add JobScheduler
 
         val engine = EpicWallpaperEngine()
         this.engine = engine
@@ -70,11 +69,12 @@ class EpicWallpaperService : WallpaperService() {
                 bitmap?.let { drawWallpaper(it) }
             }
         }
+        private var wallpaperUrl: String? = null
 
         private val contentObservable: ContentObserver = object : ContentObserver(Handler()) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 super.onChange(selfChange, uri)
-                fetchAndDraw()
+                fetchAndDraw(true)
             }
         }
         private val schedulerHelper = JobSchedulerHelper(this@EpicWallpaperService)
@@ -121,10 +121,13 @@ class EpicWallpaperService : WallpaperService() {
             }
         }
 
-        private fun fetchAndDraw() {
+        private fun fetchAndDraw(forceUpdate: Boolean = false) {
             launch(UI) {
-                val earth = EarthDataLocalSource(this@EpicWallpaperService).loadLatestEarth()
-                val imageUrl = earth.random()?.imageUrl
+                var imageUrl = wallpaperUrl
+                if (forceUpdate || imageUrl.isNullOrEmpty()) {
+                    wallpaperUrl = loadRandomUrl()
+                    imageUrl = wallpaperUrl
+                }
                 Log.i("WallpaperService==>", "previous image: $imageUrl")
                 if (imageUrl.isNullOrEmpty()) {
                     picasso.load(R.mipmap.earth_placeholder)
@@ -134,6 +137,11 @@ class EpicWallpaperService : WallpaperService() {
                         .into(bitmapTarget)
                 }
             }
+        }
+
+        private suspend fun loadRandomUrl(): String? {
+            val earth = EarthDataLocalSource(this@EpicWallpaperService).loadLatestEarth()
+            return earth.random()?.imageUrl
         }
 
         private fun drawWallpaper(bitmap: Bitmap) {

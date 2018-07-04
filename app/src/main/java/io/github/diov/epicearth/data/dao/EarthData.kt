@@ -10,6 +10,7 @@ import io.github.diov.epicearth.data.Coordinate
 import io.github.diov.epicearth.data.EarthOption
 import io.github.diov.epicearth.data.EarthOriginData
 import io.github.diov.epicearth.data.Position
+import io.github.diov.epicearth.helper.splitDate
 
 /**
  * Created by Dio_V on 2018/6/28.
@@ -43,7 +44,7 @@ data class EarthData(
                 originData.getPreviewImageUrl(option),
                 originData.getRealImageUrl(option),
                 originData.version,
-                originData.date,
+                originData.date.splitDate(),
                 originData.centroidCoordinates,
                 originData.satellitePosition,
                 originData.lunarPosition,

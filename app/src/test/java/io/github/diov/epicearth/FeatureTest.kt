@@ -2,6 +2,8 @@ package io.github.diov.epicearth
 
 import io.github.diov.epicearth.data.ColorType
 import io.github.diov.epicearth.data.ImageType
+import io.github.diov.epicearth.helper.splitDate
+import io.github.diov.epicearth.helper.urlDate
 import org.junit.Test
 import java.util.concurrent.ThreadLocalRandom
 
@@ -39,5 +41,15 @@ class FeatureTest {
             println(random)
             assert(random < 2)
         }
+    }
+
+    @Test
+    fun date_format_test() {
+        val originString = "2018-06-30 13:56:00"
+        val urlDate = originString.urlDate()
+        val splitDate = originString.splitDate()
+
+        assert(urlDate == "2018/06/30")
+        assert(splitDate == "2018-06-30")
     }
 }
