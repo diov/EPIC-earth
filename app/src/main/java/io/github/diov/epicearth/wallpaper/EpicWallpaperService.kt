@@ -74,7 +74,8 @@ class EpicWallpaperService : WallpaperService() {
         private val contentObservable: ContentObserver = object : ContentObserver(Handler()) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 super.onChange(selfChange, uri)
-                fetchAndDraw(true)
+                val needUpdate = !isPreview
+                fetchAndDraw(needUpdate)
             }
         }
         private val schedulerHelper = JobSchedulerHelper(this@EpicWallpaperService)
