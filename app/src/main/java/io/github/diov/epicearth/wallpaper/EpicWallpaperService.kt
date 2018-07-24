@@ -135,6 +135,7 @@ class EpicWallpaperService : WallpaperService() {
                         .into(bitmapTarget)
                 } else {
                     picasso.load(imageUrl)
+                        .error(R.mipmap.earth_placeholder)
                         .into(bitmapTarget)
                 }
             }
